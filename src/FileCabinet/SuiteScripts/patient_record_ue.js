@@ -18,15 +18,17 @@ define(['N/record'],
          */
         const beforeLoad = (scriptContext) => {
             var record = scriptContext.newRecord;
-            if(scriptContext.type == 'create')
+            
+            if(scriptContext.type === 'edit' || scriptContext.type === 'create')
             {
             scriptContext.form.addButton({
                 id: 'custpage_wipfli_button',
-                label: 'Alert',
-                functionName: 'alert("Please fill all details")'
+                label: 'Doctor Info',
+                functionName: 'Autopopulate()'
                  });
+                 scriptContext.form.clientScriptModulePath = './patient_record_cs.js';
             }
-
+            
         }
 
         /**
@@ -37,7 +39,9 @@ define(['N/record'],
          * @param {string} scriptContext.type - Trigger type; use values from the context.UserEventType enum
          * @since 2015.2
          */
-    
+        const beforeSubmit = (scriptContext) => {
+
+        }
 
         /**
          * Defines the function definition that is executed after record is submitted.
@@ -47,8 +51,10 @@ define(['N/record'],
          * @param {string} scriptContext.type - Trigger type; use values from the context.UserEventType enum
          * @since 2015.2
          */
-    
-        return {beforeLoad //beforeSubmit, afterSubmit
-    }
+        const afterSubmit = (scriptContext) => {
+
+        }
+
+        return {beforeLoad, beforeSubmit, afterSubmit}
 
     });

@@ -3,11 +3,12 @@
  * @NScriptType ClientScript
  * @NModuleScope SameAccount
  */
-define(['N/record'],
+define(['N/record', 'N/currentRecord', 'N/search'],
     /**
      * @param{record} record
      */
-    function (record) {
+    function (record, curRec, search) {
+
 
         /**
          * Function to be executed after page is initialized.
@@ -19,11 +20,10 @@ define(['N/record'],
          * @since 2015.2
          */
         function pageInit(scriptContext) {
-            alert("Srilaxmi");
-            console.log("hello");
+
             var myRec = scriptContext.currentRecord;
             var Phone = myRec.getField({
-                fieldId: 'custrecord_wipfli_patient_no'
+                fieldId: 'custrecord_wipfli_patient_pno'
             });
             Phone.isDisabled = true;
         }
@@ -31,16 +31,16 @@ define(['N/record'],
         function fieldChanged(scriptContext) {
             var record = scriptContext.currentRecord;
             var dob = record.getValue({
-                fieldId: 'custrecord_wipfli_patient_dob'
+                fieldId: 'custrecord_wipfli_patient_dateob'
             });
             var email = record.getValue({
-                fieldId: 'custrecord_wipfli_patient_email'
+                fieldId: 'custrecord_wipfli_patient_mail'
             });
             var Phone = record.getField({
-                fieldId: 'custrecord_wipfli_patient_no'
+                fieldId: 'custrecord_wipfli_patient_pno'
             });
             var address = record.getField({
-                fieldId: 'custrecord_wipfli_patient_address'
+                fieldId: 'custrecord_wipfli_patient_addres'
             });
             if (dob && Phone.isDisabled == true) {
                 Phone.isDisabled = false;
@@ -48,20 +48,36 @@ define(['N/record'],
             else {
                 Phone.isDisabled = true;
             }
-           
-            if(scriptContext.fieldId=='custrecord_wipfli_patient_email')
-            {
+
+            if (scriptContext.fieldId == 'custrecord_wipfli_patient_mail') {
                 record.setValue({
-                    fieldId:'custrecord_wipfli_patient_address',
-                    value:''
+                    fieldId: 'custrecord_wipfli_patient_addres',
+                    value: ''
                 })
 
             }
+
+            var firstName = record.getValue({
+                fieldId: 'custrecord_wipfli_patient_first_name'
+            });
+
+            var secondName = record.getValue({
+                fieldId: 'custrecord_wipfli_patient_second_name'
+            });
+
+            record.setValue({
+                fieldId: 'custrecord_wipfli_patient_full_name',
+                value: firstName+ " " + secondName,
+                ignoreFieldChange: true
+            });
+
+
+
         }
         function saveRecord(scriptContext) {
             var record = scriptContext.currentRecord;
             var email = record.getValue({
-                fieldId: 'custrecord_wipfli_patient_email'
+                fieldId: 'custrecord_wipfli_patient_mail'
             });
 
             if (!email) {
@@ -69,48 +85,88 @@ define(['N/record'],
                 return false;
             }
             else {
-
                 return true;
             }
 
         }
 
         function validateField(scriptContext) {
-            try{
+            try {
                 var recordvalue = scriptContext.currentRecord;
-                if (scriptContext.fieldId == 'custrecord_wipfli_patient_name') {
-                    var name = recordvalue.getValue({
-                        fieldId: 'custrecord_wipfli_patient_name'
+                if (scriptContext.fieldId == 'custrecord_wipfli_patient_first_name' || scriptContext.fieldId == 'custrecord_wipfli_patient_second_name') {
+                    var firstName = recordvalue.getValue({
+                        fieldId: 'custrecord_wipfli_patient_first_name'
                     });
-                    if(name) {
-                        if((name.length < 3) || (name.length > 20)) {
+                    var secondName = recordvalue.getValue({
+                        fieldId: 'custrecord_wipfli_patient_second_name'
+                    });
+
+                    if (firstName) {
+                        if ((firstName.length < 3) || (firstName.length > 20)) {
                             alert("Enter Proper Name");
                             recordvalue.setValue({
-                                fieldId: 'custrecord_wipfli_patient_name',
+                                fieldId: 'custrecord_wipfli_patient_first_name',
                                 value: "",
                                 ignoreFieldChange: true
                             });
                             return false;
                         }
                     }
-                 
+                    if (secondName) {
+                        if (secondName.length > 20) {
+                            alert("Enter Proper Name");
+                            recordvalue.setValue({
+                                fieldId: 'custrecord_wipfli_patient_second_name',
+                                value: "",
+                                ignoreFieldChange: true
+                            });
+                            return false;
+                        }
+                    }
+
                 }
-            } catch(e) {
-                log.error("error in validate filed",e.message);
+            } catch (e) {
+                log.error("error in validate filed", e.message);
                 return false;
             }
-         
             return true;
-
         }
 
+        function Autopopulate() {
 
+            var currRec = curRec.get();
+
+            var doctor = currRec.getValue({
+                fieldId: 'custrecord_wipfli_patient_doctor_name'
+            });
+
+            var lookupDocord = search.lookupFields({
+                type: 'customrecord_wipfli_doctor_record',
+                id: doctor,
+                columns: ['custrecord_wipfli_doctor_pno', 'custrecord_wipfli_doctor_email']
+            });
+
+            var docPno = lookupDocord['custrecord_wipfli_doctor_pno'];
+            var docEmail = lookupDocord['custrecord_wipfli_doctor_email'];
+
+            currRec.setValue({
+                fieldId: 'custrecord_wipfli_patient_doctor_pno',
+                value: docPno
+            });
+
+            currRec.setValue({
+                fieldId: 'custrecord_wipfli_patient_doctor_email',
+                value: docEmail
+            });
+
+        }
 
         return {
             pageInit: pageInit,
             fieldChanged: fieldChanged,
             saveRecord: saveRecord,
-            validateField: validateField
+            validateField: validateField,
+            Autopopulate: Autopopulate
         };
 
     });
