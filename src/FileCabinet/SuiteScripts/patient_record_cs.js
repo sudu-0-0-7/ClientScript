@@ -79,16 +79,14 @@ define(['N/record', 'N/currentRecord', 'N/search'],
         }
         function saveRecord(scriptContext) {
             var record = scriptContext.currentRecord;
-            // var email = record.getValue({
-            //     fieldId: 'custrecord_wipfli_patient_mail'
-            // });
-            // if (!email) {
-            //     alert("please enter the Email");
-            //     return false;
-            // }
-            // else {
-            //     return true;
-            // }
+            var email = record.getValue({
+                fieldId: 'custrecord_wipfli_patient_mail'
+            });
+            if (!email) {
+                alert("please enter the Email");
+                return false;
+            }
+
 
              var fullname = record.getValue({
                 fieldId: 'custrecord_wipfli_patient_full_name'
