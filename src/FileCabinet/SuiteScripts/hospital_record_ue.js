@@ -29,6 +29,22 @@ define(['N/record'],
 
         }
 
+       
+
+           
+            //  log.debug("customrecord_wipfli_patient_recordSearchObj result count",searchResultCount);
+            //  customrecord_wipfli_patient_recordSearchObj.run().each(function(result){
+            //     // .run().each has a limit of 4,000 results
+            //     return true;
+            //  });
+             
+             /*
+             customrecord_wipfli_patient_recordSearchObj.id="customsearch1674209294713";
+             customrecord_wipfli_patient_recordSearchObj.title="Custom PATIENT Search (copy)";
+             var newSearchId = customrecord_wipfli_patient_recordSearchObj.save();
+             */
+        
+
         /**
          * Defines the function definition that is executed before record is submitted.
          * @param {Object} scriptContext
@@ -48,7 +64,7 @@ define(['N/record'],
          * @since 2015.2
          */
     
-        return {beforeLoad //beforeSubmit, afterSubmit
+        return {beforeLoad//, beforeSubmit, afterSubmit
     }
 
     });

@@ -33,9 +33,7 @@ define(['N/record', 'N/currentRecord', 'N/search'],
             var dob = record.getValue({
                 fieldId: 'custrecord_wipfli_patient_dateob'
             });
-            var email = record.getValue({
-                fieldId: 'custrecord_wipfli_patient_mail'
-            });
+            
             var Phone = record.getField({
                 fieldId: 'custrecord_wipfli_patient_pno'
             });
@@ -49,10 +47,15 @@ define(['N/record', 'N/currentRecord', 'N/search'],
                 Phone.isDisabled = true;
             }
 
-            if (scriptContext.fieldId == 'custrecord_wipfli_patient_mail') {
+            var email = record.getValue({
+                fieldId: 'custrecord_wipfli_patient_mail'
+            });
+
+            if (email === 'sudarshanprabhu12@gmail.com') {
                 record.setValue({
                     fieldId: 'custrecord_wipfli_patient_addres',
-                    value: ''
+                    value: '',
+                    ignoreFieldChange: true
                 })
 
             }
@@ -76,17 +79,48 @@ define(['N/record', 'N/currentRecord', 'N/search'],
         }
         function saveRecord(scriptContext) {
             var record = scriptContext.currentRecord;
-            var email = record.getValue({
-                fieldId: 'custrecord_wipfli_patient_mail'
+            // var email = record.getValue({
+            //     fieldId: 'custrecord_wipfli_patient_mail'
+            // });
+            // if (!email) {
+            //     alert("please enter the Email");
+            //     return false;
+            // }
+            // else {
+            //     return true;
+            // }
+
+             var fullname = record.getValue({
+                fieldId: 'custrecord_wipfli_patient_full_name'
             });
 
-            if (!email) {
-                alert("please enter the Email");
-                return false;
-            }
-            else {
-                return true;
-            }
+
+            var customrecord_wipfli_patient_recordSearchObj = search.create({
+                type: "customrecord_wipfli_patient_record",
+                filters:
+                [
+                   ["custrecord_wipfli_patient_full_name","is",fullname]
+                ],
+                columns:
+                [
+                   search.createColumn({
+                      name: "scriptid",
+                      sort: search.Sort.ASC,
+                      label: "Script ID"
+                   }),
+                   search.createColumn({name: "custrecord_wipfli_patient_full_name", label: "Patient Full name"}),
+                ]
+             });
+             var searchResultCount = customrecord_wipfli_patient_recordSearchObj.runPaged().count;
+        
+             if(searchResultCount > 1)
+             {
+                alert("The patient name is already exist");
+                return false
+             }
+             else{
+                return true
+             }
 
         }
 
