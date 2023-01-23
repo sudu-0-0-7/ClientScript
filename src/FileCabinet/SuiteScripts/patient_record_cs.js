@@ -111,7 +111,7 @@ define(['N/record', 'N/currentRecord', 'N/search'],
              });
              var searchResultCount = customrecord_wipfli_patient_recordSearchObj.runPaged().count;
         
-             if(searchResultCount > 1)
+             if(searchResultCount > 0)
              {
                 alert("The patient name is already exist");
                 return false
