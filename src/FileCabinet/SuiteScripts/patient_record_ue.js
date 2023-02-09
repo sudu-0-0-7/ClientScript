@@ -24,10 +24,11 @@ define(['N/record'],
             scriptContext.form.addButton({
                 id: 'custpage_wipfli_button',
                 label: 'Doctor Info',
-                functionName: 'Autopopulate()'
+                functionName: 'autopopulate()'
                  });
                  scriptContext.form.clientScriptModulePath = './patient_record_cs.js';
             }
+            
             
         }
 

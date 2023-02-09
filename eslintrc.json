@@ -1,0 +1,58 @@
+{
+  "root": true,
+  "plugins": ["suitescript"],
+  "env": {
+    "browser": true,
+    "es6": true,
+    "amd": true,
+    "jquery": true,
+    "node": true
+  },
+  "extends": ["eslint:recommended", "plugin:suitescript/recommended"],
+  "parserOptions": {
+    "ecmaVersion": 13,
+    "sourceType": "module"
+  },
+  "globals": {
+    "toastr": "readonly",
+    "moment": "readonly",
+    "NLoader": "readonly",
+    "useRequire": "readonly"
+  },
+  "ignorePatterns": ["documentation", "dist"],
+  "rules": {
+    "no-param-reassign": "off",
+    "suitescript/module-vars": "off",
+    "no-empty": "warn",
+    "indent": ["error", 4, {"SwitchCase": 1}],
+    "quotes": "off",
+    "semi": ["error", "always"],
+    "curly": ["error", "all"],
+    "no-lone-blocks": "error",
+    "no-new": "warn",
+    "no-new-func": "error",
+    "no-new-wrappers": "error",
+    "radix": "off",
+    "yoda": "error",
+    "array-bracket-spacing": ["error", "never"],
+    "brace-style": ["error", "1tbs", {"allowSingleLine": true}],
+    "camelcase": "warn",
+    "lines-between-class-members": [
+      "error",
+      "always",
+      {"exceptAfterSingleLine": true}
+    ],
+    "new-parens": "error",
+    "no-array-constructor": "error",
+    "no-multi-assign": "error",
+    "no-multiple-empty-lines": ["error", {"max": 2, "maxEOF": 2, "maxBOF": 2}],
+    "no-new-object": "error",
+    "padded-blocks": ["error", "never"],
+    "no-prototype-builtins": "off",
+    "no-useless-escape": "warn",
+    "no-unused-vars": [
+      "warn",
+      {"vars": "local", "args": "after-used", "ignoreRestSiblings": false}
+    ]
+  }
+}
