@@ -19,18 +19,15 @@ define(['N/record'],
         const beforeLoad = (scriptContext) => {
             var record = scriptContext.newRecord;
             
-            if(scriptContext.type === 'edit' || scriptContext.type === 'create')
-            {
-            scriptContext.form.addButton({
-                id: 'custpage_wipfli_button',
-                label: 'Doctor Info',
-                functionName: 'autopopulate()'
-                 });
-                 scriptContext.form.clientScriptModulePath = './patient_record_cs.js';
+            if(scriptContext.type === 'edit' || scriptContext.type === 'create') {
+                scriptContext.form.addButton({
+                    id: 'custpage_wipfli_button',
+                    label: 'Doctor Info',
+                    functionName: 'autopopulate()'
+                });
+                scriptContext.form.clientScriptModulePath = './patient_record_cs.js';
             }
-            
-            
-        }
+        };
 
         /**
          * Defines the function definition that is executed before record is submitted.
@@ -42,7 +39,7 @@ define(['N/record'],
          */
         const beforeSubmit = (scriptContext) => {
 
-        }
+        };
 
         /**
          * Defines the function definition that is executed after record is submitted.
@@ -54,8 +51,7 @@ define(['N/record'],
          */
         const afterSubmit = (scriptContext) => {
 
-        }
+        };
 
-        return {beforeLoad, beforeSubmit, afterSubmit}
-
+        return {beforeLoad, beforeSubmit, afterSubmit};
     });

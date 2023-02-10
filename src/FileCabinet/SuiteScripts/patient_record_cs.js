@@ -29,7 +29,7 @@ define(['N/record', 'N/currentRecord', 'N/search'],
                 var expireDate = record.getCurrentSublistValue({
                     sublistId: 'recmachcustrecord_wipfli_medicine_ref_patient',
                     fieldId: 'custrecord_wipfli_medicine_expire_date'
-                })
+                });
                 log.debug("expire dateeeee", expireDate);
                 if (expireDate) {
                     expireDate = new Date(expireDate);
@@ -64,8 +64,7 @@ define(['N/record', 'N/currentRecord', 'N/search'],
 
             if (dob && Phone.isDisabled == true) {
                 Phone.isDisabled = false;
-            }
-            else {
+            } else {
                 Phone.isDisabled = true;
             }
 
@@ -90,7 +89,7 @@ define(['N/record', 'N/currentRecord', 'N/search'],
 
             var dateOfBirth = record.getValue({
                 fieldId: 'custrecord_wipfli_patient_dateob'
-            })
+            });
 
             var today = new Date();  
             var date = new Date(dateOfBirth);
@@ -106,40 +105,38 @@ define(['N/record', 'N/currentRecord', 'N/search'],
                 var price = record.getCurrentSublistValue({
                     sublistId: 'recmachcustrecord_wipfli_medicine_ref_patient',
                     fieldId: 'custrecord_wipfli_medicine_price'
-                })
+                });
 
                 var quantity = record.getCurrentSublistValue({
                     sublistId: 'recmachcustrecord_wipfli_medicine_ref_patient',
                     fieldId: 'custrecord_wipfli_medicine_quantity'
-                })
+                });
 
                 var totalPrice = price * quantity;
                 record.setCurrentSublistValue({
                     sublistId: 'recmachcustrecord_wipfli_medicine_ref_patient',
                     fieldId: 'custrecord_wipfli_medicine_total_price',
                     value: totalPrice
-                })
+                });
             }
-
         }
         function saveRecord(scriptContext) {
             var record = scriptContext.currentRecord;
             var sublistCount = record.getLineCount({
                 sublistId: 'recmachcustrecord_wipfli_medicine_ref_patient'
-            })
+            });
             log.debug("sublist", sublistCount);
             if (sublistCount === 0) {
                 alert("There need be atleast one Medicine list");
-                return false
+                return false;
             }
 
             validateEmail(scriptContext);
 
             if (pagemode === 'create') {
                 return searchForDuplicates(scriptContext);
-            }
-            else {
-                return true
+            } else {
+                return true;
             }
         }
 
@@ -180,9 +177,9 @@ define(['N/record', 'N/currentRecord', 'N/search'],
             log.debug("count value", searchResultCount);
             if (searchResultCount > 0) {
                 alert("The patient name is already exist");
-                return false
+                return false;
             }
-            return true
+            return true;
         }
 
         function validateField(scriptContext) {
@@ -192,7 +189,7 @@ define(['N/record', 'N/currentRecord', 'N/search'],
                 var expireDate = record.getCurrentSublistValue({
                     sublistId: 'recmachcustrecord_wipfli_medicine_ref_patient',
                     fieldId: 'custrecord_wipfli_medicine_expire_date'
-                })
+                });
 
                 if (expireDate) {
                     expireDate = new Date(expireDate);
@@ -203,7 +200,7 @@ define(['N/record', 'N/currentRecord', 'N/search'],
                             sublistId: 'recmachcustrecord_wipfli_medicine_ref_patient',
                             fieldId: 'custrecord_wipfli_medicine_expire_date',
                             value: ''
-                        })
+                        });
                         return false;
                     }
                     return true;
@@ -251,7 +248,6 @@ define(['N/record', 'N/currentRecord', 'N/search'],
         }
 
         function autopopulate() {
-
             var currRec = curRec.get();
 
             var doctor = currRec.getValue({
@@ -279,7 +275,7 @@ define(['N/record', 'N/currentRecord', 'N/search'],
                 });
                 var docEmail = searchObject[0].getValue({
                     name: "custrecord_wipfli_doctor_email"
-                })
+                });
 
                 currRec.setValue({
                     fieldId: 'custrecord_wipfli_patient_doctor_pno',
@@ -291,7 +287,6 @@ define(['N/record', 'N/currentRecord', 'N/search'],
                     value: docEmail
                 });
             }
-
         }
 
         return {
@@ -301,5 +296,4 @@ define(['N/record', 'N/currentRecord', 'N/search'],
             validateField: validateField,
             autopopulate: autopopulate
         };
-
     });

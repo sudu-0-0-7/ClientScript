@@ -2,11 +2,11 @@
  * @NApiVersion 2.1
  * @NScriptType Restlet
  */
-define(['N/record', 'N/log', 'N/search'],
+define(['N/record', 'N/search'],
     /**
  * @param{record} record
  */
-    (record, log, search) => {
+    (record, search) => {
         /**
          * Defines the function that is executed when a GET request is sent to a RESTlet.
          * @param {Object} requestParams - Parameters from HTTP request URL; parameters passed as an Object (for all supported
@@ -19,14 +19,10 @@ define(['N/record', 'N/log', 'N/search'],
             try {
                 var patientId = requestParams.id;
                 var patientName = requestParams.name;
-                var medName = requestParams.medname;
-                log.debug("patientid", patientId);
-                log.debug("patient name", patientName);
                 var filter = [];
                 if (!isEmpty(patientName)) {
-                    filter.push(["custrecord_wipfli_patient_full_name", "contains", patientName])
-                }
-                else {
+                    filter.push(["custrecord_wipfli_patient_full_name", "contains", patientName]);
+                } else {
                     filter.push(["internalid", "is", patientId]);
                 }
 
@@ -48,8 +44,8 @@ define(['N/record', 'N/log', 'N/search'],
                     var patientdetails = searchPatient.run();
                     var searchObject = patientdetails.getRange(0, 1000);
                     var patientData = [];
-                    for (i = 0; i < searchObject.length; i++) {
-                        var patientName = searchObject[i].getValue({
+                    for (var i = 0; i < searchObject.length; i++) {
+                        patientName = searchObject[i].getValue({
                             name: "custrecord_wipfli_patient_full_name"
                         });
                         var patientAge = searchObject[i].getValue({
@@ -66,27 +62,24 @@ define(['N/record', 'N/log', 'N/search'],
                         });
                     }
                     return patientData;
+                } else {
+                    return "The given Id or name was not found in Patient record";
                 }
-                else {
-                    return "The given Id or name was not found in Patient record"
-                }
-            }
-            catch (e) {
+            } catch (e) {
                 log.debug({
                     title: "Error in get function",
                     details: e.message
-                })
+                });
                 return e.message;
             }
-            function isEmpty(value) { return value === '' || value === null || value === undefined }
-        }
+            function isEmpty(value) { return value === '' || value === null || value === undefined; }
+        };
 
         const post = (requestBody) => {
             try {
-                for (i = 0; i < requestBody.length; i++) {
-                    log.debug("iiii value", i);
+                for (var i = 0; i < requestBody.length; i++) {
                     var data = requestBody[i];
-                    log.debug("json data", data);
+
                     //creating JSON to check for mandatory fields in patient record
                     var PatientJson = {
                         "firstName": "",
@@ -97,26 +90,11 @@ define(['N/record', 'N/log', 'N/search'],
                         "address": "",
                         "doctorName": "",
                         "medicine": ""
-                    }
-
-                    var medicineJson = {
-                        "name": "",
-                        "price": "",
-                        "quantity": "",
-                        "expDate": ""
-                    }
+                    };
                     var firstName = requestBody[i].firstName;
+                    log.debug("firstname", firstName);
                     var lastName = requestBody[i].lastName;
-                    var email = requestBody[i].email;
-                    var phoneNumber = requestBody[i].phoneNumber;
-                    var age = requestBody[i].age;
-                    var dateOfBirth = requestBody[i].dateOfBirth;
-                    var patientDateOfBirth = new Date(dateOfBirth);
-                    var address = requestBody[i].address;
-                    var doctorName = requestBody[i].doctorName;
-                    var medicine = requestBody[i].medicine;
-                    //Patient search to check for the enterted ID is there in patient record or not
-                    fullname = firstName + ' ' + lastName;
+                    var fullname = firstName + ' ' + lastName;
                     var patientSearch = search.create({
                         type: "customrecord_wipfli_patient_record",
                         filters:
@@ -135,9 +113,8 @@ define(['N/record', 'N/log', 'N/search'],
                     });
                     var searchResultCount = patientSearch.runPaged().count;
                     if (searchResultCount > 0) {
-                        return "The patient name is already exist"
+                        return "The patient name is already exist";
                     }
-
                     //cheching for madatory fields in patient record
                     var checkPatientEmptyFields;
                     Object.keys(PatientJson).forEach(function (key) {
@@ -145,11 +122,31 @@ define(['N/record', 'N/log', 'N/search'],
                             checkPatientEmptyFields = `Please enter ${key}`;
                             return false;
                         }
-                    })
-
+                    });
                     if (!isEmpty(checkPatientEmptyFields)) {
                         return checkPatientEmptyFields;
                     }
+                    log.debug("requestbody", data);
+                    var patientRecCreate = createPatient(data);
+                }
+                return patientRecCreate;
+            } catch (e) {
+                log.error("error in post", e.message);
+                return e.message;
+            }
+            function isEmpty(value) { return value === '' || value === null || value === undefined; }
+
+            function createPatient(requestBody) {
+                try {
+                    var firstName = requestBody.firstName;
+                    log.debug("first name in function", firstName);
+                    var lastName = requestBody.lastName;
+                    var email = requestBody.email;
+                    var phoneNumber = requestBody.phoneNumber;
+                    var dateOfBirth = requestBody.dateOfBirth;
+                    var patientDateOfBirth = new Date(dateOfBirth);
+                    var address = requestBody.address;
+                    var doctorName = requestBody.doctorName;
 
                     var patientRecord = record.create({
                         type: 'customrecord_wipfli_patient_record',
@@ -170,7 +167,7 @@ define(['N/record', 'N/log', 'N/search'],
                     patientRecord.setValue({
                         fieldId: 'custrecord_wipfli_patient_full_name',
                         value: firstName + ' ' + lastName
-                    })
+                    });
 
                     var today = new Date();
                     var date = new Date(dateOfBirth);
@@ -205,24 +202,30 @@ define(['N/record', 'N/log', 'N/search'],
                         fieldId: 'custrecord_wipfli_patient_doctor_name',
                         text: doctorName,
                         ignoreFieldChange: true
-                    })
-
-                    for (j = 0; j < medicine.length; j++) {
+                    });
+                    var medicine = requestBody.medicine;
+                    for (var j = 0; j < medicine.length; j++) {
                         var name = medicine[j].name;
                         var price = medicine[j].price;
                         var quantity = medicine[j].quantity;
                         var expDate = medicine[j].expDate;
                         var expireDate = new Date(expDate);
 
+                        //checking for mandatory fields in medicine record
+                        var medicineJson = {
+                            "name": "",
+                            "price": "",
+                            "quantity": "",
+                            "expDate": ""
+                        };
                         var medicineData = medicine[j];
-
                         var checkMedicineEmptyFields;
                         Object.keys(medicineJson).forEach(function (key) {
                             if (isEmpty(medicineData[key])) {
                                 checkMedicineEmptyFields = `Please enter ${key}`;
                                 return false;
                             }
-                        })
+                        });
 
                         if (!isEmpty(checkMedicineEmptyFields)) {
                             return checkMedicineEmptyFields;
@@ -264,16 +267,15 @@ define(['N/record', 'N/log', 'N/search'],
                         });
                     }
                     patientRecord.save({
-                    })
+                    });
+
+                    return "Record successfully created";
+                } catch (e) {
+                    log.error("error in post", e.message);
+                    return e.message;
                 }
-                return " Patient Record is successfully created"
             }
-            catch (e) {
-                log.error("error in post", e.message);
-                return e.message;
-            }
-            function isEmpty(value) { return value === '' || value === null || value === undefined }
-        }
+        };
 
         const put = (requestBody) => {
             try {
@@ -288,6 +290,8 @@ define(['N/record', 'N/log', 'N/search'],
                 }
                 var address = requestBody.address;
                 var doctorName = requestBody.doctorName;
+
+                ////Patient search to check for the enterted ID is there in patient record or not
                 var patientRecSearch = search.create({
                     type: "customrecord_wipfli_patient_record",
                     filters:
@@ -301,13 +305,14 @@ define(['N/record', 'N/log', 'N/search'],
                 });
                 var searchResultCount = patientRecSearch.runPaged().count;
                 if (searchResultCount > 0) {
-                    fullname = firstName + ' ' + lastName;
+                    var fullName = firstName + ' ' + lastName;
                     if (!isEmpty(firstName) && !isEmpty(lastName)) {
+                        //patient record search to check for identical names
                         var patientSearch = search.create({
                             type: "customrecord_wipfli_patient_record",
                             filters:
                                 [
-                                    ["custrecord_wipfli_patient_full_name", "is", fullname]
+                                    ["custrecord_wipfli_patient_full_name", "is", fullName]
                                 ],
                             columns:
                                 [
@@ -319,9 +324,9 @@ define(['N/record', 'N/log', 'N/search'],
                                     search.createColumn({ name: "custrecord_wipfli_patient_full_name", label: "Patient Full name" }),
                                 ]
                         });
-                        var searchResultCount = patientSearch.runPaged().count;
+                        searchResultCount = patientSearch.runPaged().count;
                         if (searchResultCount > 0) {
-                            return "The patient name is already exist"
+                            return "The patient name is already exist";
                         }
                     }
 
@@ -348,7 +353,7 @@ define(['N/record', 'N/log', 'N/search'],
                     patientRecord.setValue({
                         fieldId: 'custrecord_wipfli_patient_full_name',
                         value: firstName + ' ' + lastName
-                    })
+                    });
 
                     var today = new Date();
                     var date = new Date(dateOfBirth);
@@ -392,29 +397,28 @@ define(['N/record', 'N/log', 'N/search'],
                             fieldId: 'custrecord_wipfli_patient_doctor_name',
                             text: doctorName,
                             ignoreFieldChange: true
-                        })
+                        });
                     }
 
                     var medicine = requestBody.medicine;
                     if (!isEmpty(medicine)) {
                         var linecount = patientRecord.getLineCount({
                             sublistId: 'recmachcustrecord_wipfli_medicine_ref_patient'
-                        })
+                        });
 
-                        for (i = 0; i < medicine.length; i++) {
+                        for (var i = 0; i < medicine.length; i++) {
                             var quantity = medicine[i].quantity;
                             var price = medicine[i].price;
                             var expDate = medicine[i].expDate;
-                            for (j = 0; j < linecount; j++) {
+                            for (var j = 0; j < linecount; j++) {
                                 var expireDate = new Date(expDate);
                                 var medName = patientRecord.getSublistValue({
                                     sublistId: 'recmachcustrecord_wipfli_medicine_ref_patient',
                                     fieldId: 'name',
                                     line: j
-                                })
+                                });
 
                                 if (medicine[i].name == medName) {
-
                                     if (quantity) {
                                         patientRecord.setSublistValue({
                                             sublistId: 'recmachcustrecord_wipfli_medicine_ref_patient',
@@ -438,9 +442,9 @@ define(['N/record', 'N/log', 'N/search'],
                                             sublistId: 'recmachcustrecord_wipfli_medicine_ref_patient',
                                             fieldId: 'custrecord_wipfli_medicine_price',
                                             line: j
-                                        })
+                                        });
 
-                                        total = medPrice * quantity;
+                                        var total = medPrice * quantity;
                                         patientRecord.setSublistValue({
                                             sublistId: 'recmachcustrecord_wipfli_medicine_ref_patient',
                                             fieldId: 'custrecord_wipfli_medicine_total_price',
@@ -454,7 +458,7 @@ define(['N/record', 'N/log', 'N/search'],
                                             sublistId: 'recmachcustrecord_wipfli_medicine_ref_patient',
                                             fieldId: 'custrecord_wipfli_medicine_price',
                                             line: j
-                                        })
+                                        });
 
                                         total = price * medQuantity;
                                         patientRecord.setSublistValue({
@@ -466,11 +470,11 @@ define(['N/record', 'N/log', 'N/search'],
                                     }
 
                                     if (!isEmpty(price) && !isEmpty(quantity)) {
-                                        var medQuantity = patientRecord.getSublistValue({
+                                        medQuantity = patientRecord.getSublistValue({
                                             sublistId: 'recmachcustrecord_wipfli_medicine_ref_patient',
                                             fieldId: 'custrecord_wipfli_medicine_price',
                                             line: j
-                                        })
+                                        });
 
                                         total = price * quantity;
                                         patientRecord.setSublistValue({
@@ -494,21 +498,19 @@ define(['N/record', 'N/log', 'N/search'],
                         }
                     }
                     patientRecord.save();
-                    return "The record updated successfully"
+                    return "The record updated successfully";
+                } else {
+                    return "The id is Not found in patient record";
                 }
-                else {
-                    return "The id is Not found in patient record"
-                }
-            }
-            catch (e) {
+            } catch (e) {
                 log.debug({
                     title: "Error in put function",
                     details: e.message
-                })
-                return e.message
+                });
+                return e.message;
             }
-            function isEmpty(value) { return value === '' || value === null || value === undefined }
-        }
+            function isEmpty(value) { return value === '' || value === null || value === undefined; }
+        };
 
         const doDelete = (requestParams) => {
             try {
@@ -516,6 +518,7 @@ define(['N/record', 'N/log', 'N/search'],
                 var type = requestParams.type;
                 var rec = type.toLowerCase();
                 if (rec == 'patient') {
+                    ////Patient search to check for the enterted ID is there in patient record or not
                     var patientRecSearch = search.create({
                         type: "customrecord_wipfli_patient_record",
                         filters:
@@ -537,39 +540,36 @@ define(['N/record', 'N/log', 'N/search'],
 
                         var sublistCount = patientRec.getLineCount({
                             sublistId: 'recmachcustrecord_wipfli_medicine_ref_patient'
-                        })
+                        });
 
                         if (sublistCount > 0) {
-                            for (i = 0; i < sublistCount; i++) {
+                            for (var i = 0; i < sublistCount; i++) {
                                 var subListId = patientRec.getSublistValue({
                                     sublistId: 'recmachcustrecord_wipfli_medicine_ref_patient',
                                     fieldId: 'id',
                                     line: i
                                 });
 
-                                var deleteSublist = record.delete({
+                                record.delete({
                                     type: 'customrecord_wipfli_medicine_record',
                                     id: subListId
                                 });
                             }
-                            var deletePatient = record.delete({
+                            record.delete({
                                 type: 'customrecord_wipfli_patient_record',
                                 id: recId
-                            })
+                            });
 
-                            return "patient record deleted successfully"
-                        }
-                        else {
-                            var deletePatient = record.delete({
+                            return "patient record deleted successfully";
+                        } else {
+                            record.delete({
                                 type: 'customrecord_wipfli_patient_record',
                                 id: recId
-                            })
-                            return "patient record deleted successfully"
-
+                            });
+                            return "patient record deleted successfully";
                         }
-                    }
-                    else {
-                        return "The patient Record is not Found with this id"
+                    } else {
+                        return "The patient Record is not Found with this id";
                     }
                 }
 
@@ -590,34 +590,31 @@ define(['N/record', 'N/log', 'N/search'],
                                 search.createColumn({ name: "name", label: "medicine name" }),
                             ]
                     });
-                    var searchResultCount = medicineRecSearch.runPaged().count;
+                    searchResultCount = medicineRecSearch.runPaged().count;
                     if (searchResultCount > 0) {
-                        var medicineRec = record.load({
+                        record.load({
                             type: 'customrecord_wipfli_medicine_record',
                             id: recId,
                             isDynamic: true,
-                        })
+                        });
 
-                        var deleteMedicine = record.delete({
+                        record.delete({
                             type: 'customrecord_wipfli_medicine_record',
                             id: recId
-                        })
-                        return "Record deleted successfully from medicine record"
-                    }
-                    else {
-                        return "The medical record is not found with this id"
+                        });
+                        return "Record deleted successfully from medicine record";
+                    } else {
+                        return "The medical record is not found with this id";
                     }
                 }
-            }
-            catch (e) {
+            } catch (e) {
                 log.error({
                     title: "Error in Delete function",
                     details: e.message
-                })
-                return e.message
+                });
+                return e.message;
             }
-        }
+        };
 
-        return { get, post, put, delete: doDelete }
-
+        return { get, post, put, delete: doDelete };
     });
