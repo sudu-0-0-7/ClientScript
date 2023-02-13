@@ -36,7 +36,11 @@ define(['N/record', 'N/search'],
                         [
                             search.createColumn({ name: "custrecord_wipfli_patient_full_name" }),
                             search.createColumn({ name: "custrecord_wipfli_patient_age" }),
-                            search.createColumn({ name: "custrecord_wipfli_patient_mail" })
+                            search.createColumn({ name: "custrecord_wipfli_patient_mail" }),
+                            search.createColumn({ name: "custrecord_wipfli_patient_dateob" }),
+                            search.createColumn({ name: "custrecord_wipfli_patient_pno" }),
+                            search.createColumn({ name: "custrecordcustrecord_wipfli_patient_addr" }),
+                            search.createColumn({ name: "custrecord_wipfli_patient_doctor_name" })
                         ]
                 });
                 var searchResultCount = searchPatient.runPaged().count;
@@ -54,11 +58,28 @@ define(['N/record', 'N/search'],
                         var patientEmail = searchObject[i].getValue({
                             name: "custrecord_wipfli_patient_mail"
                         });
+                        var patientDateOfBirth = searchObject[i].getValue({
+                            name: "custrecord_wipfli_patient_dateob"
+                        });
+                        var patientPhoneNumber = searchObject[i].getValue({
+                            name: "custrecord_wipfli_patient_pno"
+                        });
+                        var patientAddress = searchObject[i].getValue({
+                            name: "custrecordcustrecord_wipfli_patient_addr"
+                        });
+                        var patientDoctorName = searchObject[i].getValue({
+                            name: "custrecord_wipfli_patient_doctor_name"
+                        });
+
 
                         patientData.push({
                             'Patient Name': patientName,
                             'Patient Age': patientAge,
-                            'Patient Email': patientEmail
+                            'Patient Email': patientEmail,
+                            'Patient Date of Birth': patientDateOfBirth,
+                            'Patient Phone Number': patientPhoneNumber,
+                            'Patient Address': patientAddress,
+                            'Patient Doctor Name': patientDoctorName
                         });
                     }
                     return patientData;
@@ -95,6 +116,7 @@ define(['N/record', 'N/search'],
                     log.debug("firstname", firstName);
                     var lastName = requestBody[i].lastName;
                     var fullname = firstName + ' ' + lastName;
+                    //patient search for check duplicate names
                     var patientSearch = search.create({
                         type: "customrecord_wipfli_patient_record",
                         filters:
@@ -126,7 +148,6 @@ define(['N/record', 'N/search'],
                     if (!isEmpty(checkPatientEmptyFields)) {
                         return checkPatientEmptyFields;
                     }
-                    log.debug("requestbody", data);
                     var patientRecCreate = createPatient(data);
                 }
                 return patientRecCreate;
@@ -135,7 +156,8 @@ define(['N/record', 'N/search'],
                 return e.message;
             }
             function isEmpty(value) { return value === '' || value === null || value === undefined; }
-
+            
+            //function to create patient record
             function createPatient(requestBody) {
                 try {
                     var firstName = requestBody.firstName;
@@ -418,6 +440,7 @@ define(['N/record', 'N/search'],
                                     line: j
                                 });
 
+                                //update sublist by taking medicine name
                                 if (medicine[i].name == medName) {
                                     if (quantity) {
                                         patientRecord.setSublistValue({
